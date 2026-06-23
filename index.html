@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المالية - Karim & Othmane</title>
+    <meta name="description" content="شيت إدارة المصاريف والمداخيل لشركة التجارة الإلكترونية">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span>FinSheet</span>
+            </div>
+            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="user-switcher">
+            <div class="user-avatar" id="currentUserAvatar">ك</div>
+            <select id="currentUser" class="user-select">
+                <option value="كريم">كريم</option>
+                <option value="عثمان">عثمان</option>
+            </select>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-tab="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span>لوحة التحكم</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="products">
+                <i class="fas fa-box-open"></i>
+                <span>المنتجات</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="expenses">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>المصاريف</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="income">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>المداخيل</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="usd">
+                <i class="fas fa-dollar-sign"></i>
+                <span>شراء الدولار</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="orders">
+                <i class="fas fa-shopping-cart"></i>
+                <span>الطلبيات</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="reports">
+                <i class="fas fa-chart-bar"></i>
+                <span>التقارير</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-backup" id="btnExportData" title="تصدير البيانات">
+                <i class="fas fa-download"></i>
+                <span>نسخة احتياطية</span>
+            </button>
+            <button class="btn-restore" id="btnImportData" title="استيراد البيانات">
+                <i class="fas fa-upload"></i>
+                <span>استيراد</span>
+            </button>
+            <input type="file" id="importFileInput" accept=".json" style="display:none">
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-title" id="topbarTitle">لوحة التحكم</div>
+            <div class="topbar-filters">
+                <select id="filterMonth" class="filter-select">
+                    <option value="">كل الأشهر</option>
+                    <option value="0">جانفي</option>
+                    <option value="1">فيفري</option>
+                    <option value="2">مارس</option>
+                    <option value="3">أفريل</option>
+                    <option value="4">ماي</option>
+                    <option value="5">جوان</option>
+                    <option value="6">جويلية</option>
+                    <option value="7">أوت</option>
+                    <option value="8">سبتمبر</option>
+                    <option value="9">أكتوبر</option>
+                    <option value="10">نوفمبر</option>
+                    <option value="11">ديسمبر</option>
+                </select>
+                <select id="filterYear" class="filter-select">
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- ==================== DASHBOARD ==================== -->
+        <section class="tab-content active" id="tab-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card stat-income">
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">إجمالي المداخيل</span>
+                        <span class="stat-value" id="statTotalIncome">0 د.ج</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-expense">
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">إجمالي المصاريف</span>
+                        <span class="stat-value" id="statTotalExpenses">0 د.ج</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-profit">
+                    <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">الربح الصافي</span>
+                        <span class="stat-value" id="statNetProfit">0 د.ج</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-roas">
+                    <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">ROAS</span>
+                        <span class="stat-value" id="statROAS">0x</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-orders">
+                    <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">طلبيات مشحونة</span>
+                        <span class="stat-value" id="statShippedOrders">0</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-return">
+                    <div class="stat-icon"><i class="fas fa-undo"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">نسبة الرجوع</span>
+                        <span class="stat-value" id="statReturnRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-line"></i> المداخيل vs المصاريف</h3>
+                    <canvas id="chartIncomeVsExpense"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-pie"></i> توزيع المصاريف</h3>
+                    <canvas id="chartExpenseBreakdown"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> أداء المنتجات</h3>
+                    <canvas id="chartProductPerformance"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-area"></i> الربح اليومي</h3>
+                    <canvas id="chartDailyProfit"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3 class="section-title"><i class="fas fa-history"></i> آخر العمليات</h3>
+                <div class="activity-list" id="recentActivityList">
+                    <p class="empty-state">لا توجد عمليات بعد</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PRODUCTS ==================== -->
+        <section class="tab-content" id="tab-products">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-box-open"></i> إدارة المنتجات</h2>
+                <button class="btn-add" id="btnAddProduct"><i class="fas fa-plus"></i> إضافة منتج</button>
+            </div>
+
+            <!-- Suppliers Management -->
+            <div class="suppliers-bar">
+                <span class="suppliers-label"><i class="fas fa-store"></i> الموردين:</span>
+                <div class="suppliers-list" id="suppliersList"></div>
+                <button class="btn-small" id="btnAddSupplier"><i class="fas fa-plus"></i> إضافة مورد</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th>المورد</th>
+                            <th>سعر الشراء</th>
+                            <th>سعر البيع</th>
+                            <th>سعر الجملة</th>
+                            <th>تكلفة التغليف</th>
+                            <th>المخزون</th>
+                            <th>هامش الربح</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsBody"></tbody>
+                </table>
+                <p class="empty-state" id="productsEmpty">لا توجد منتجات بعد. أضف منتجك الأول!</p>
+            </div>
+        </section>
+
+        <!-- ==================== EXPENSES ==================== -->
+        <section class="tab-content" id="tab-expenses">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> المصاريف</h2>
+            </div>
+
+            <!-- Expense Sub-tabs -->
+            <div class="sub-tabs">
+                <button class="sub-tab active" data-subtab="ads"><i class="fab fa-facebook"></i> الإعلانات</button>
+                <button class="sub-tab" data-subtab="goods"><i class="fas fa-boxes"></i> شراء السلع</button>
+                <button class="sub-tab" data-subtab="packaging"><i class="fas fa-gift"></i> التغليف</button>
+                <button class="sub-tab" data-subtab="employee"><i class="fas fa-user-tie"></i> عمولة العامل</button>
+                <button class="sub-tab" data-subtab="other"><i class="fas fa-ellipsis-h"></i> أخرى</button>
+            </div>
+
+            <!-- Ads Expenses -->
+            <div class="sub-content active" id="subtab-ads">
+                <div class="sub-header">
+                    <h3><i class="fab fa-facebook"></i> مصاريف الإعلانات</h3>
+                    <button class="btn-add" id="btnAddAd"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>المنصة</th>
+                                <th>المبلغ (USD)</th>
+                                <th>سعر الدولار</th>
+                                <th>المبلغ (DZD)</th>
+                                <th>ملاحظات</th>
+                                <th>بواسطة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adsBody"></tbody>
+                    </table>
+                    <p class="empty-state" id="adsEmpty">لا توجد مصاريف إعلانات بعد</p>
+                </div>
+                <div class="table-footer">
+                    <span class="total-label">الإجمالي:</span>
+                    <span class="total-value" id="adsTotalDZD">0 د.ج</span>
+                    <span class="total-secondary" id="adsTotalUSD">0 $</span>
+                </div>
+            </div>
+
+            <!-- Goods Expenses -->
+            <div class="sub-content" id="subtab-goods">
+                <div class="sub-header">
+                    <h3><i class="fas fa-boxes"></i> شراء السلع</h3>
+                    <button class="btn-add" id="btnAddGoods"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>المورد</th>
+                                <th>المنتج</th>
+                                <th>الكمية</th>
+                                <th>سعر الوحدة</th>
+                                <th>الإجمالي (DZD)</th>
+                                <th>بواسطة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="goodsBody"></tbody>
+                    </table>
+                    <p class="empty-state" id="goodsEmpty">لا توجد عمليات شراء بعد</p>
+                </div>
+                <div class="table-footer">
+                    <span class="total-label">الإجمالي:</span>
+                    <span class="total-value" id="goodsTotal">0 د.ج</span>
+                </div>
+            </div>
+
+            <!-- Packaging Expenses -->
+            <div class="sub-content" id="subtab-packaging">
+                <div class="sub-header">
+                    <h3><i class="fas fa-gift"></i> مصاريف التغليف</h3>
+                    <button class="btn-add" id="btnAddPackaging"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>نوع التغليف</th>
+                                <th>الكمية</th>
+                                <th>الإجمالي (DZD)</th>
+                                <th>بواسطة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="packagingBody"></tbody>
+                    </table>
+                    <p class="empty-state" id="packagingEmpty">لا توجد مصاريف تغليف بعد</p>
+                </div>
+                <div class="table-footer">
+                    <span class="total-label">الإجمالي:</span>
+                    <span class="total-value" id="packagingTotal">0 د.ج</span>
+                </div>
+            </div>
+
+            <!-- Employee Commission -->
+            <div class="sub-content" id="subtab-employee">
+                <div class="sub-header">
+                    <h3><i class="fas fa-user-tie"></i> عمولة العامل (تأكيد الطلبيات)</h3>
+                    <button class="btn-add" id="btnAddEmployee"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>عدد الطلبيات المشحونة</th>
+                                <th>العمولة/طلب (DZD)</th>
+                                <th>الإجمالي (DZD)</th>
+                                <th>بواسطة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeBody"></tbody>
+                    </table>
+                    <p class="empty-state" id="employeeEmpty">لا توجد عمولات بعد</p>
+                </div>
+                <div class="table-footer">
+                    <span class="total-label">الإجمالي:</span>
+                    <span class="total-value" id="employeeTotal">0 د.ج</span>
+                </div>
+            </div>
+
+            <!-- Other Expenses -->
+            <div class="sub-content" id="subtab-other">
+                <div class="sub-header">
+                    <h3><i class="fas fa-ellipsis-h"></i> مصاريف أخرى</h3>
+                    <button class="btn-add" id="btnAddOther"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الوصف</th>
+                                <th>المبلغ (DZD)</th>
+                                <th>بواسطة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otherBody"></tbody>
+                    </table>
+                    <p class="empty-state" id="otherEmpty">لا توجد مصاريف أخرى بعد</p>
+                </div>
+                <div class="table-footer">
+                    <span class="total-label">الإجمالي:</span>
+                    <span class="total-value" id="otherTotal">0 د.ج</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== INCOME ==================== -->
+        <section class="tab-content" id="tab-income">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-hand-holding-usd"></i> المداخيل - تحصيل DHD</h2>
+                <button class="btn-add" id="btnAddIncome"><i class="fas fa-plus"></i> إضافة تحصيل</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>تاريخ الاستلام</th>
+                            <th>المبلغ المستلم (DZD)</th>
+                            <th>طرود موصلة</th>
+                            <th>طرود مرجعة</th>
+                            <th>نسبة التوصيل</th>
+                            <th>ملاحظات</th>
+                            <th>استلم بواسطة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incomeBody"></tbody>
+                </table>
+                <p class="empty-state" id="incomeEmpty">لا توجد تحصيلات بعد</p>
+            </div>
+            <div class="table-footer">
+                <span class="total-label">إجمالي التحصيل:</span>
+                <span class="total-value" id="incomeTotal">0 د.ج</span>
+                <span class="total-secondary" id="incomeParcels">0 طرد موصل</span>
+            </div>
+        </section>
+
+        <!-- ==================== USD PURCHASES ==================== -->
+        <section class="tab-content" id="tab-usd">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-dollar-sign"></i> سجل شراء الدولار</h2>
+                <button class="btn-add" id="btnAddUsd"><i class="fas fa-plus"></i> إضافة عملية</button>
+            </div>
+            <div class="usd-summary">
+                <div class="usd-card">
+                    <span class="usd-card-label">إجمالي الدولارات المشتراة</span>
+                    <span class="usd-card-value" id="usdTotalBought">0 $</span>
+                </div>
+                <div class="usd-card">
+                    <span class="usd-card-label">إجمالي المدفوع بالدينار</span>
+                    <span class="usd-card-value" id="usdTotalPaidDZD">0 د.ج</span>
+                </div>
+                <div class="usd-card">
+                    <span class="usd-card-label">متوسط سعر الصرف</span>
+                    <span class="usd-card-value" id="usdAvgRate">0 د.ج/$</span>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>تاريخ الشراء</th>
+                            <th>المبلغ (DZD)</th>
+                            <th>المبلغ (USD)</th>
+                            <th>سعر الصرف</th>
+                            <th>ملاحظات</th>
+                            <th>بواسطة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usdBody"></tbody>
+                </table>
+                <p class="empty-state" id="usdEmpty">لا توجد عمليات شراء دولار بعد</p>
+            </div>
+        </section>
+
+        <!-- ==================== ORDERS ==================== -->
+        <section class="tab-content" id="tab-orders">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-shopping-cart"></i> الطلبيات</h2>
+                <button class="btn-add" id="btnAddOrder"><i class="fas fa-plus"></i> إضافة طلبية</button>
+            </div>
+            <div class="orders-summary">
+                <div class="order-stat">
+                    <span class="order-stat-num" id="ordersConfirmed">0</span>
+                    <span class="order-stat-label">مؤكد</span>
+                </div>
+                <div class="order-stat">
+                    <span class="order-stat-num" id="ordersShipped">0</span>
+                    <span class="order-stat-label">مشحون</span>
+                </div>
+                <div class="order-stat">
+                    <span class="order-stat-num" id="ordersDelivered">0</span>
+                    <span class="order-stat-label">موصل</span>
+                </div>
+                <div class="order-stat">
+                    <span class="order-stat-num" id="ordersReturned">0</span>
+                    <span class="order-stat-label">مرجع</span>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المنتج</th>
+                            <th>الكمية</th>
+                            <th>نوع البيع</th>
+                            <th>سعر البيع</th>
+                            <th>الإجمالي</th>
+                            <th>التوصيل</th>
+                            <th>الحالة</th>
+                            <th>بواسطة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody"></tbody>
+                </table>
+                <p class="empty-state" id="ordersEmpty">لا توجد طلبيات بعد</p>
+            </div>
+        </section>
+
+        <!-- ==================== REPORTS ==================== -->
+        <section class="tab-content" id="tab-reports">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> التقارير</h2>
+                <button class="btn-add" id="btnExportReport"><i class="fas fa-file-csv"></i> تصدير CSV</button>
+            </div>
+
+            <!-- Report Type Selector -->
+            <div class="report-tabs">
+                <button class="report-tab active" data-report="monthly"><i class="fas fa-calendar-alt"></i> شهري</button>
+                <button class="report-tab" data-report="weekly"><i class="fas fa-calendar-week"></i> أسبوعي</button>
+                <button class="report-tab" data-report="product"><i class="fas fa-box"></i> حسب المنتج</button>
+                <button class="report-tab" data-report="breakeven"><i class="fas fa-balance-scale"></i> نقطة التعادل</button>
+            </div>
+
+            <!-- Monthly Report -->
+            <div class="report-content active" id="report-monthly">
+                <div class="report-card">
+                    <h3>التقرير الشهري</h3>
+                    <div class="report-grid" id="monthlyReportGrid"></div>
+                </div>
+            </div>
+
+            <!-- Weekly Report -->
+            <div class="report-content" id="report-weekly">
+                <div class="report-card">
+                    <h3>التقرير الأسبوعي</h3>
+                    <div class="report-grid" id="weeklyReportGrid"></div>
+                </div>
+            </div>
+
+            <!-- Product Report -->
+            <div class="report-content" id="report-product">
+                <div class="report-card">
+                    <h3>أداء المنتجات</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>الكمية المباعة</th>
+                                    <th>إجمالي المبيعات</th>
+                                    <th>تكلفة البضاعة</th>
+                                    <th>الربح الإجمالي</th>
+                                    <th>هامش الربح</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productReportBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Break-even Report -->
+            <div class="report-content" id="report-breakeven">
+                <div class="report-card">
+                    <h3>نقطة التعادل (Break-Even)</h3>
+                    <div class="breakeven-info" id="breakevenInfo">
+                        <p class="empty-state">أضف منتجات ومصاريف لحساب نقطة التعادل</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Product Modal -->
+    <div class="modal-overlay" id="modalProduct">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalProductTitle">إضافة منتج</h3>
+                <button class="modal-close" data-close="modalProduct"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formProduct" class="modal-form">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label for="productName">اسم المنتج</label>
+                    <input type="text" id="productName" required placeholder="مثال: حزام جلد">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productSupplier">المورد</label>
+                        <select id="productSupplier" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">الكمية في المخزون</label>
+                        <input type="number" id="productStock" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productBuyPrice">سعر الشراء (DZD)</label>
+                        <input type="number" id="productBuyPrice" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="productSellPrice">سعر البيع (DZD)</label>
+                        <input type="number" id="productSellPrice" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productWholesalePrice">سعر الجملة (DZD) <small>(اختياري)</small></label>
+                        <input type="number" id="productWholesalePrice" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="productPackagingCost">تكلفة التغليف (DZD)</label>
+                        <input type="number" id="productPackagingCost" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalProduct">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div class="modal-overlay" id="modalSupplier">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h3>إضافة مورد</h3>
+                <button class="modal-close" data-close="modalSupplier"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formSupplier" class="modal-form">
+                <div class="form-group">
+                    <label for="supplierName">اسم المورد</label>
+                    <input type="text" id="supplierName" required placeholder="مثال: مورد 1">
+                </div>
+                <div class="form-group">
+                    <label for="supplierPhone">رقم الهاتف <small>(اختياري)</small></label>
+                    <input type="text" id="supplierPhone" placeholder="0xxx xxx xxx">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalSupplier">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ad Expense Modal -->
+    <div class="modal-overlay" id="modalAd">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalAdTitle">إضافة مصروف إعلان</h3>
+                <button class="modal-close" data-close="modalAd"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formAd" class="modal-form">
+                <input type="hidden" id="adId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adDate">التاريخ</label>
+                        <input type="date" id="adDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adPlatform">المنصة</label>
+                        <select id="adPlatform" required>
+                            <option value="Facebook">Facebook</option>
+                            <option value="TikTok">TikTok</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adAmountUSD">المبلغ (USD)</label>
+                        <input type="number" id="adAmountUSD" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="adExchangeRate">سعر الدولار (DZD)</label>
+                        <input type="number" id="adExchangeRate" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ بالدينار</label>
+                    <div class="calculated-field" id="adAmountDZD">0 د.ج</div>
+                </div>
+                <div class="form-group">
+                    <label for="adNotes">ملاحظات</label>
+                    <input type="text" id="adNotes" placeholder="وصف اختياري">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalAd">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goods Expense Modal -->
+    <div class="modal-overlay" id="modalGoods">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalGoodsTitle">إضافة شراء سلع</h3>
+                <button class="modal-close" data-close="modalGoods"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formGoods" class="modal-form">
+                <input type="hidden" id="goodsId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="goodsDate">التاريخ</label>
+                        <input type="date" id="goodsDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="goodsSupplier">المورد</label>
+                        <select id="goodsSupplier" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsProduct">المنتج</label>
+                    <select id="goodsProduct" required></select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="goodsQty">الكمية</label>
+                        <input type="number" id="goodsQty" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="goodsUnitPrice">سعر الوحدة (DZD)</label>
+                        <input type="number" id="goodsUnitPrice" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>الإجمالي</label>
+                    <div class="calculated-field" id="goodsTotalCalc">0 د.ج</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalGoods">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Packaging Expense Modal -->
+    <div class="modal-overlay" id="modalPackaging">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h3 id="modalPackagingTitle">إضافة مصروف تغليف</h3>
+                <button class="modal-close" data-close="modalPackaging"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formPackaging" class="modal-form">
+                <input type="hidden" id="packagingId">
+                <div class="form-group">
+                    <label for="packagingDate">التاريخ</label>
+                    <input type="date" id="packagingDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="packagingType">نوع التغليف</label>
+                    <input type="text" id="packagingType" required placeholder="مثال: كراتين صغيرة">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="packagingQty">الكمية</label>
+                        <input type="number" id="packagingQty" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="packagingAmount">الإجمالي (DZD)</label>
+                        <input type="number" id="packagingAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalPackaging">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employee Commission Modal -->
+    <div class="modal-overlay" id="modalEmployee">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h3 id="modalEmployeeTitle">إضافة عمولة عامل</h3>
+                <button class="modal-close" data-close="modalEmployee"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formEmployee" class="modal-form">
+                <input type="hidden" id="employeeId">
+                <div class="form-group">
+                    <label for="employeeDate">التاريخ</label>
+                    <input type="date" id="employeeDate" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employeeOrders">عدد الطلبيات المشحونة</label>
+                        <input type="number" id="employeeOrders" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="employeeRate">العمولة/طلب (DZD)</label>
+                        <input type="number" id="employeeRate" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>الإجمالي</label>
+                    <div class="calculated-field" id="employeeTotalCalc">0 د.ج</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalEmployee">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Other Expense Modal -->
+    <div class="modal-overlay" id="modalOther">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h3 id="modalOtherTitle">إضافة مصروف آخر</h3>
+                <button class="modal-close" data-close="modalOther"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formOther" class="modal-form">
+                <input type="hidden" id="otherId">
+                <div class="form-group">
+                    <label for="otherDate">التاريخ</label>
+                    <input type="date" id="otherDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="otherDesc">الوصف</label>
+                    <input type="text" id="otherDesc" required placeholder="مثال: إيجار المخزن">
+                </div>
+                <div class="form-group">
+                    <label for="otherAmount">المبلغ (DZD)</label>
+                    <input type="number" id="otherAmount" required min="0" step="0.01">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalOther">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Income Modal -->
+    <div class="modal-overlay" id="modalIncome">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalIncomeTitle">إضافة تحصيل DHD</h3>
+                <button class="modal-close" data-close="modalIncome"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formIncome" class="modal-form">
+                <input type="hidden" id="incomeId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="incomeDate">تاريخ الاستلام</label>
+                        <input type="date" id="incomeDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeAmount">المبلغ المستلم (DZD)</label>
+                        <input type="number" id="incomeAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="incomeDelivered">طرود موصلة</label>
+                        <input type="number" id="incomeDelivered" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeReturned">طرود مرجعة</label>
+                        <input type="number" id="incomeReturned" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="incomeNotes">ملاحظات</label>
+                    <input type="text" id="incomeNotes" placeholder="ملاحظات اختيارية">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalIncome">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- USD Purchase Modal -->
+    <div class="modal-overlay" id="modalUsd">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalUsdTitle">إضافة عملية شراء دولار</h3>
+                <button class="modal-close" data-close="modalUsd"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formUsd" class="modal-form">
+                <input type="hidden" id="usdId">
+                <div class="form-group">
+                    <label for="usdDate">تاريخ الشراء</label>
+                    <input type="date" id="usdDate" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="usdAmountDZD">المبلغ المدفوع (DZD)</label>
+                        <input type="number" id="usdAmountDZD" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="usdAmountUSD">المبلغ المحصل (USD)</label>
+                        <input type="number" id="usdAmountUSD" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>سعر الصرف</label>
+                    <div class="calculated-field" id="usdRateCalc">0 د.ج/$</div>
+                </div>
+                <div class="form-group">
+                    <label for="usdNotes">ملاحظات</label>
+                    <input type="text" id="usdNotes" placeholder="مثال: من صديق، بارابول...">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalUsd">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="modal-overlay" id="modalOrder">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalOrderTitle">إضافة طلبية</h3>
+                <button class="modal-close" data-close="modalOrder"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formOrder" class="modal-form">
+                <input type="hidden" id="orderId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderDate">التاريخ</label>
+                        <input type="date" id="orderDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderProduct">المنتج</label>
+                        <select id="orderProduct" required></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderQty">الكمية</label>
+                        <input type="number" id="orderQty" required min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="orderType">نوع البيع</label>
+                        <select id="orderType" required>
+                            <option value="تجزئة">تجزئة</option>
+                            <option value="جملة">جملة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderPrice">سعر البيع (DZD)</label>
+                        <input type="number" id="orderPrice" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="orderShipping">سعر التوصيل (DZD)</label>
+                        <input type="number" id="orderShipping" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="orderStatus">الحالة</label>
+                    <select id="orderStatus" required>
+                        <option value="مؤكد">مؤكد</option>
+                        <option value="مشحون">مشحون</option>
+                        <option value="موصل">موصل</option>
+                        <option value="مرجع">مرجع</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الإجمالي</label>
+                    <div class="calculated-field" id="orderTotalCalc">0 د.ج</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">حفظ</button>
+                    <button type="button" class="btn-secondary" data-close="modalOrder">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="modalDelete">
+        <div class="modal modal-small modal-danger">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف</h3>
+                <button class="modal-close" data-close="modalDelete"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            </div>
+            <div class="form-actions">
+                <button class="btn-danger" id="btnConfirmDelete">حذف</button>
+                <button class="btn-secondary" data-close="modalDelete">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
