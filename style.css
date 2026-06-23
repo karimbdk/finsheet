@@ -1295,15 +1295,33 @@ body {
 }
 
 /* ---- Responsive ---- */
+
+/* Tablet */
 @media (max-width: 1024px) {
     .charts-grid {
         grid-template-columns: 1fr;
     }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .breakeven-info {
+        grid-template-columns: 1fr;
+    }
 }
 
+/* Mobile - Main Breakpoint */
 @media (max-width: 768px) {
+    html {
+        font-size: 13px;
+    }
+
+    /* Sidebar - Full screen overlay on mobile */
     .sidebar {
         transform: translateX(100%);
+        width: 280px;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
     }
 
     .sidebar.open {
@@ -1314,67 +1332,540 @@ body {
         display: block;
     }
 
+    .sidebar-header {
+        padding: 16px 20px;
+    }
+
+    .user-switcher {
+        padding: 12px 20px;
+    }
+
+    .sidebar-nav {
+        padding: 8px;
+    }
+
+    .nav-item {
+        padding: 12px 14px;
+        gap: 12px;
+        font-size: 0.95rem;
+    }
+
+    .sidebar-footer {
+        padding: 12px;
+    }
+
+    /* Main Content - No sidebar margin */
     .main-content {
         margin-right: 0;
     }
 
+    /* Topbar */
+    .topbar {
+        padding: 0 12px;
+        height: 56px;
+        gap: 8px;
+    }
+
     .menu-toggle {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
     }
 
+    .topbar-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .topbar-filters {
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .filter-select {
+        font-size: 0.75rem;
+        padding: 6px 8px;
+        min-width: 0;
+    }
+
+    /* Tab Content */
     .tab-content {
-        padding: 16px;
+        padding: 14px;
     }
 
+    /* Section Headers */
+    .section-header {
+        margin-bottom: 16px;
+        gap: 10px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        gap: 8px;
+    }
+
+    .btn-add {
+        padding: 8px 14px;
+        font-size: 0.82rem;
+        gap: 6px;
+    }
+
+    /* Stats Grid */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
     .stat-card {
-        padding: 16px;
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.72rem;
     }
 
     .stat-value {
+        font-size: 1rem;
+    }
+
+    /* Charts */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .chart-card {
+        padding: 16px;
+    }
+
+    .chart-title {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+
+    /* Sub Tabs (Expenses) */
+    .sub-tabs {
+        gap: 4px;
+        padding: 4px;
+        margin-bottom: 14px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .sub-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sub-tab {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+        gap: 6px;
+    }
+
+    .sub-header {
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sub-header h3 {
+        font-size: 0.9rem;
+    }
+
+    /* Tables */
+    .table-container {
+        border-radius: var(--radius-sm);
+        margin: 0 -2px;
+    }
+
+    .data-table th {
+        padding: 10px 12px;
+        font-size: 0.72rem;
+    }
+
+    .data-table td {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+
+    .action-btns {
+        gap: 4px;
+    }
+
+    .btn-edit,
+    .btn-delete {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+
+    .table-footer {
+        padding: 10px 14px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .total-value {
+        font-size: 1rem;
+    }
+
+    /* Suppliers Bar */
+    .suppliers-bar {
+        padding: 10px 14px;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .suppliers-label {
+        font-size: 0.82rem;
+        width: 100%;
+    }
+
+    .supplier-tag {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+    }
+
+    /* USD Summary */
+    .usd-summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .usd-card {
+        padding: 14px;
+    }
+
+    .usd-card-label {
+        font-size: 0.78rem;
+    }
+
+    .usd-card-value {
         font-size: 1.1rem;
     }
 
+    /* Orders Summary */
     .orders-summary {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .order-stat {
+        padding: 14px;
+    }
+
+    .order-stat-num {
+        font-size: 1.5rem;
+    }
+
+    .order-stat-label {
+        font-size: 0.78rem;
+    }
+
+    /* Reports */
+    .report-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 4px;
+        padding: 4px;
+        margin-bottom: 14px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .report-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .report-tab {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .report-card {
+        padding: 16px;
+    }
+
+    .report-card h3 {
+        font-size: 1rem;
+        margin-bottom: 14px;
+    }
+
+    .report-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .report-item {
+        padding: 12px;
+    }
+
+    .report-item-label {
+        font-size: 0.72rem;
+    }
+
+    .report-item-value {
+        font-size: 0.95rem;
+    }
+
+    /* Break-even */
+    .breakeven-info {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .breakeven-product {
+        padding: 14px;
+    }
+
+    .breakeven-detail {
+        font-size: 0.82rem;
+    }
+
+    /* Recent Activity */
+    .recent-activity {
+        padding: 16px;
+    }
+
+    .activity-item {
+        gap: 10px;
+        padding: 10px 0;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+
+    .activity-text {
+        font-size: 0.85rem;
+    }
+
+    .activity-date {
+        font-size: 0.72rem;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+
+    .modal {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        animation: modalSlideUp 0.3s ease;
+    }
+
+    .modal-small {
+        max-width: 100%;
+    }
+
+    @keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(100%); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+        padding: 16px 18px;
+        position: sticky;
+        top: 0;
+        background: var(--bg-modal);
+        z-index: 1;
+    }
+
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+
+    .modal-form {
+        padding: 16px 18px;
+    }
+
+    .modal-body {
+        padding: 16px 18px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        font-size: 0.82rem;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px 12px;
+        font-size: 0.88rem;
     }
 
     .form-row {
         grid-template-columns: 1fr;
+        gap: 0;
     }
 
-    .topbar {
-        padding: 0 16px;
+    .calculated-field {
+        padding: 8px 12px;
+        font-size: 0.95rem;
     }
 
-    .topbar-title {
-        font-size: 1rem;
+    .form-actions {
+        padding: 14px 18px 20px;
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-modal);
+        border-top: 1px solid var(--border-color);
     }
 
-    .filter-select {
-        font-size: 0.78rem;
-        padding: 6px 10px;
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        padding: 10px 20px;
+        font-size: 0.88rem;
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* Toast */
+    .toast-container {
+        bottom: 14px;
+        left: 14px;
+        right: 14px;
+    }
+
+    .toast {
+        min-width: auto;
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.82rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 24px 14px;
+        font-size: 0.88rem;
     }
 }
 
-@media (max-width: 480px) {
+/* Small Phones */
+@media (max-width: 400px) {
+    html {
+        font-size: 12px;
+    }
+
+    .topbar {
+        padding: 0 10px;
+    }
+
+    .topbar-title {
+        font-size: 0.88rem;
+    }
+
+    .tab-content {
+        padding: 10px;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     .stat-card {
         flex-direction: row;
+        padding: 12px;
     }
 
-    .sub-tabs {
-        flex-direction: column;
+    .stat-value {
+        font-size: 1.05rem;
     }
 
-    .report-tabs {
+    .orders-summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .order-stat {
+        padding: 10px;
+    }
+
+    .order-stat-num {
+        font-size: 1.3rem;
+    }
+
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
         flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Wider modals on tiny screens */
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal {
+        max-height: 90vh;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
     }
 }
+
+/* Landscape phone fix */
+@media (max-height: 500px) and (max-width: 900px) {
+    .modal {
+        max-height: 95vh;
+    }
+
+    .topbar {
+        height: 48px;
+    }
+}
+
+/* Overlay behind sidebar on mobile */
+@media (max-width: 768px) {
+    .sidebar.open::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 280px;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+}
+
