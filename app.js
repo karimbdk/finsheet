@@ -1,6 +1,30 @@
 /* ======================================
-   FinSheet - App Logic
+   FinSheet - App Logic + Firebase Sync
    ====================================== */
+
+// ---- Firebase Configuration ----
+const firebaseConfig = {
+    apiKey: "AIzaSyBD6UCw3eCiME28Zy611yD5PPzYJUQ1aZo",
+    authDomain: "finsheet-ko-2026.firebaseapp.com",
+    databaseURL: "https://finsheet-ko-2026-default-rtdb.firebaseio.com",
+    projectId: "finsheet-ko-2026",
+    storageBucket: "finsheet-ko-2026.firebasestorage.app",
+    messagingSenderId: "826762688710",
+    appId: "1:826762688710:web:3baae3473a2a14e7483fc7"
+};
+
+let firebaseReady = false;
+let dataRef = null;
+
+try {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    dataRef = db.ref('finsheet');
+    firebaseReady = true;
+    console.log('✅ Firebase initialized');
+} catch (e) {
+    console.warn('⚠️ Firebase not configured, using localStorage only', e);
+}
 
 // ---- Data Store ----
 const STORAGE_KEY = 'finsheet_data';
@@ -20,6 +44,7 @@ const defaultData = () => ({
 });
 
 let DATA = loadData();
+let firebaseListenerActive = false;
 
 function loadData() {
     try {
@@ -27,7 +52,6 @@ function loadData() {
         if (raw) {
             const parsed = JSON.parse(raw);
             const def = defaultData();
-            // Merge with defaults for any missing keys
             for (const key in def) {
                 if (!(key in parsed)) parsed[key] = def[key];
             }
@@ -40,7 +64,60 @@ function loadData() {
 }
 
 function saveData() {
+    // Always save to localStorage (instant cache)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+    // Sync to Firebase if available
+    if (firebaseReady && dataRef) {
+        dataRef.set(DATA).catch(err => {
+            console.error('Firebase save error:', err);
+            showToast('خطأ في حفظ البيانات في السحابة', 'error');
+        });
+    }
+}
+
+// Firebase real-time listener
+function initFirebase() {
+    if (!firebaseReady || !dataRef) {
+        console.warn('Firebase not available, running in offline mode');
+        refreshAll();
+        return;
+    }
+
+    dataRef.on('value', (snapshot) => {
+        const firebaseData = snapshot.val();
+        if (firebaseData) {
+            // Merge with defaults for safety
+            const def = defaultData();
+            for (const key in def) {
+                if (!(key in firebaseData)) firebaseData[key] = def[key];
+                // Convert Firebase objects back to arrays if needed
+                if (Array.isArray(def[key]) && firebaseData[key] && !Array.isArray(firebaseData[key])) {
+                    firebaseData[key] = Object.values(firebaseData[key]);
+                }
+            }
+            DATA = firebaseData;
+            // Cache locally
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+            refreshAll();
+            if (!firebaseListenerActive) {
+                firebaseListenerActive = true;
+                console.log('🔄 Firebase real-time sync active');
+                showToast('متصل بالسحابة ☁️', 'info');
+            }
+        } else {
+            // No data in Firebase yet, push local data
+            const localData = loadData();
+            const hasData = Object.values(localData).some(v => Array.isArray(v) && v.length > 0);
+            if (hasData) {
+                dataRef.set(localData);
+            }
+            refreshAll();
+        }
+    }, (error) => {
+        console.error('Firebase listener error:', error);
+        showToast('خطأ في الاتصال بالسحابة', 'error');
+        refreshAll();
+    });
 }
 
 function generateId() {
@@ -1931,5 +2008,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDelete();
     initExportImport();
 
-    refreshAll();
+    // Initialize Firebase real-time sync
+    // (refreshAll will be called by Firebase listener)
+    initFirebase();
 });
